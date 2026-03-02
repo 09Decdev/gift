@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trung Tâm Tặng Vé - Mayogu</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Trung Tâm Tặng Vé</h1>
+        <nav id="tabs">
+          <button class="tab-btn active" data-tab="user">
+            Cổng Người Dùng
+          </button>
+          <button class="tab-btn" data-tab="admin">Quản Trị Viên</button>
+        </nav>
+      </header>
+
+      <main>
+        <!-- User Section -->
+        <section id="user-section" class="tab-content active">
+          <div class="card full-width">
+            <h3>Xác thực Người dùng</h3>
+            <p>
+              Nhập mã Bearer Token (JWT) của bạn để xem vé và thực hiện các hành
+              động người dùng.
+            </p>
+            <div class="form-group">
+              <input
+                type="text"
+                id="user-token-input"
+                placeholder="Mã JWT (Bearer Token)"
+              />
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <h3>Nhận Vé Qua Mã</h3>
+              <p>Nhập mã giới thiệu của bạn để nhận vé miễn phí.</p>
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="referral-code"
+                  placeholder="Vd: REF-1234"
+                />
+                <button id="claim-referral-btn" class="primary-btn">
+                  Nhận Vé Ngay
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Phần Thưởng Nhiệm Vụ</h3>
+              <p>Hoàn thành các nhiệm vụ cộng đồng để nhận thêm vé.</p>
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="task-campaign-id"
+                  placeholder="ID Chiến dịch"
+                />
+                <button id="claim-task-btn" class="secondary-btn">
+                  Kiểm Tra Điều Kiện
+                </button>
+              </div>
+            </div>
+
+            <div class="card full-width">
+              <h3>Vé Của Tôi</h3>
+              <button id="refresh-tickets-btn" class="text-btn">Làm mới</button>
+              <div id="ticket-list" class="ticket-grid">
+                <p class="placeholder">Đang tải danh sách vé...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin-section" class="tab-content">
+          <div class="grid">
+            <div class="card">
+              <h3>Tạo Chiến Dịch</h3>
+              <div class="form">
+                <input
+                  type="password"
+                  id="admin-token"
+                  placeholder="Mã Admin Secret"
+                  value="n7QLEXVhdqEqrqaVWinUpAPhIJyJihmT42w_uPGc79lOunanVUOsm8f3TWgjbU0vGNvtA0B3VuZotyY-WLjBBw"
+                />
+                <input
+                  type="text"
+                  id="campaign-name"
+                  placeholder="Tên chiến dịch"
+                />
+                <select id="campaign-type">
+                  <option value="EMAIL_DISTRIBUTION">Phát qua Email</option>
+                  <option value="REFERRAL_CODE">Mã Giới Thiệu</option>
+                  <option value="TASK_BASED">Theo Nhiệm Vụ</option>
+                </select>
+                <input
+                  type="text"
+                  id="target-event-id"
+                  placeholder="ID Sự kiện (Event ID)"
+                />
+                <input
+                  type="text"
+                  id="ticket-type-id"
+                  placeholder="ID Loại vé (Ticket Type ID)"
+                />
+                <input
+                  type="text"
+                  id="referral-code-input"
+                  placeholder="Mã giới thiệu (Nếu có)"
+                />
+                <div class="date-group">
+                  <label>Ngày bắt đầu</label>
+                  <input type="datetime-local" id="start-date" />
+                </div>
+                <div class="date-group">
+                  <label>Ngày kết thúc</label>
+                  <input type="datetime-local" id="end-date" />
+                </div>
+                <input
+                  type="number"
+                  id="total-quantity"
+                  placeholder="Tổng số lượng vé"
+                />
+                <button id="create-campaign-btn" class="primary-btn">
+                  Khởi Tạo Chiến Dịch
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Phát Vé Qua Email</h3>
+              <div class="form">
+                <input
+                  type="text"
+                  id="dist-campaign-id"
+                  placeholder="ID Chiến dịch"
+                />
+                <textarea
+                  id="dist-emails"
+                  placeholder="Danh sách Email (mỗi dòng 1 email) hoặc JSON: [{email: '...', quantity: 1}]"
+                ></textarea>
+                <button id="distribute-email-btn" class="primary-btn">
+                  Phát Vé Ngay
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Nhập Kho Vé (Inventory)</h3>
+              <div class="form">
+                <input
+                  type="text"
+                  id="import-campaign-id"
+                  placeholder="ID Chiến dịch"
+                />
+                <textarea
+                  id="import-data"
+                  placeholder='Định dạng JSON: [{"ticketCode": "...", "imageUrl": "..."}]'
+                ></textarea>
+                <button id="import-inventory-btn" class="secondary-btn">
+                  Nhập Kho
+                </button>
+              </div>
+            </div>
+
+            <div class="card full-width">
+              <h3>Phát Vé Từ Google Sheets</h3>
+              <p>
+                Nhập Link Google Sheet (Chế độ: Bất kỳ ai có liên kết đều có thể
+                xem).
+              </p>
+              <div class="form">
+                <div style="display: flex; flex-direction: column; gap: 10px">
+                  <input
+                    type="text"
+                    id="gsheet-url"
+                    placeholder="Link Google Sheet (Chỉ xem)"
+                    style="flex: 1"
+                  />
+                  <input
+                    type="text"
+                    id="gsheet-gas-url"
+                    placeholder="Link Google Apps Script (Để khóa ô & Lưu vết)"
+                    style="flex: 1"
+                  />
+                  <button id="load-gsheet-btn" class="secondary-btn">
+                    Tải Dữ Liệu
+                  </button>
+                </div>
+
+                <div
+                  id="gsheet-preview-container"
+                  class="hidden"
+                  style="margin-top: 15px"
+                >
+                  <h4>Xem trước dữ liệu:</h4>
+                  <div
+                    style="
+                      max-height: 200px;
+                      overflow-y: auto;
+                      background: rgba(0, 0, 0, 0.2);
+                      border-radius: 8px;
+                      margin: 10px 0;
+                    "
+                  >
+                    <table
+                      style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 0.85rem;
+                      "
+                    >
+                      <thead
+                        style="position: sticky; top: 0; background: #1e293b"
+                      >
+                        <tr>
+                          <th
+                            style="
+                              padding: 10px;
+                              text-align: left;
+                              border-bottom: 1px solid var(--border);
+                            "
+                          >
+                            Email
+                          </th>
+                          <th
+                            style="
+                              padding: 10px;
+                              text-align: center;
+                              border-bottom: 1px solid var(--border);
+                            "
+                          >
+                            Số lượng
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="gsheet-preview-body">
+                        <!-- Preview rows go here -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="form-group">
+                    <input
+                      type="text"
+                      id="gsheet-campaign-id"
+                      placeholder="ID Chiến dịch đích"
+                    />
+                    <button id="gsheet-distribute-btn" class="primary-btn">
+                      Bắt Đầu Phát Vé
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div id="toast" class="toast hidden"></div>
+    </div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
