@@ -5,6 +5,10 @@ const ADMIN_TOKEN =
 // const BASE_URL = "http://192.168.0.165:3000/content-service";
 // const ADMIN_TOKEN =
 //   "n7QLEXVhdqEqrqaVWinUpAPhIJyJihmT42w_uPGc79lOunanVUOsm8f3TWgjbU0vGNvtA0B3VuZotyY-WLjBBw";
+
+// const BASE_URL = "http://localhost:3000/content-service";
+// const ADMIN_TOKEN =
+//   "n7QLEXVhdqEqrqaVWinUpAPhIJyJihmT42w_uPGc79lOunanVUOsm8f3TWgjbU0vGNvtA0B3VuZotyY-WLjBBw";
 export const api = {
   async request(
     path,
@@ -67,11 +71,21 @@ export const api = {
       adminToken,
     );
   },
-  distributeEmail(campaignId, distributions, adminToken) {
+  distributeEmail(
+    campaignId,
+    distributions,
+    adminToken,
+    distributeAt = null,
+    comingSoonImageUrl = null,
+  ) {
+    const payload = { campaignId, distributions };
+    if (distributeAt) payload.distributeAt = distributeAt;
+    if (comingSoonImageUrl) payload.comingSoonImageUrl = comingSoonImageUrl;
+
     return this.request(
       "/gifts/admin/distribute-email",
       "POST",
-      { campaignId, distributions },
+      payload,
       null,
       adminToken,
     );

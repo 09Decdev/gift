@@ -146,20 +146,28 @@ document
     const adminToken = document.getElementById("admin-token").value;
     const campaignId = document.getElementById("dist-campaign-id").value;
     const rawData = document.getElementById("dist-emails").value;
+    const distTimeInput = document.getElementById("dist-time").value;
+    const comingSoonUrl = document.getElementById("dist-coming-soon-url").value;
 
     let distributions;
     try {
-      // Try JSON first
-      distributions = JSON.parse(rawData);
+      // Dọn dẹp dấu phẩy dư ở cuối (nhẹ nhàng hơn để không phá vỡ format)
+      const cleanedRaw = rawData.trim().replace(/,\s*([\]}])/g, "$1");
+      distributions = JSON.parse(cleanedRaw);
+
+      // Nếu user nhập 1 object đơn lẻ {email: ...}, tự bọc vào mảng
+      if (!Array.isArray(distributions)) {
+        distributions = [distributions];
+      }
     } catch (e) {
-      // Fallback to line-separated emails
-      distributions = rawData
-        .split("\n")
-        .filter((e) => e.trim())
-        .map((email) => ({
-          email: email.trim(),
-          quantity: 1,
-        }));
+      // Fallback: Quét bằng Regex để trích xuất các địa chỉ email có trong văn bản thô
+      const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+      const foundEmails = rawData.match(emailRegex) || [];
+
+      distributions = foundEmails.map((email) => ({
+        email: email,
+        quantity: 1, // Fallback mặc định mỗi email 1 vé
+      }));
     }
 
     if (!campaignId || !distributions.length) {
@@ -169,16 +177,27 @@ document
       );
     }
 
+    let distributeAt = null;
+    if (distTimeInput) {
+      distributeAt = new Date(distTimeInput).toISOString();
+    }
+
     try {
       const res = await api.distributeEmail(
         campaignId,
         distributions,
         adminToken,
+        distributeAt,
+        comingSoonUrl || null,
       );
       showToast(
         `Đã phát thành công cho ${res.success.length} user, thất bại ${res.failed.length}`,
       );
       console.log(res);
+      // Xóa form sau khi public thành công nếu muốn (Tùy chọn)
+      document.getElementById("dist-emails").value = "";
+      document.getElementById("dist-time").value = "";
+      document.getElementById("dist-coming-soon-url").value = "";
     } catch (err) {
       showToast(err.message, "error");
     }
@@ -282,6 +301,10 @@ document
   .addEventListener("click", async () => {
     const adminToken = document.getElementById("admin-token").value;
     const campaignId = document.getElementById("gsheet-campaign-id").value;
+    const distTimeInput = document.getElementById("gsheet-dist-time").value;
+    const comingSoonUrl = document.getElementById(
+      "gsheet-coming-soon-url",
+    ).value;
 
     if (!campaignId) return showToast("Vui lòng nhập ID chiến dịch", "error");
     if (gsheetData.length === 0)
@@ -295,8 +318,19 @@ document
       );
     }
 
+    let distributeAt = null;
+    if (distTimeInput) {
+      distributeAt = new Date(distTimeInput).toISOString();
+    }
+
     try {
-      const res = await api.distributeEmail(campaignId, gsheetData, adminToken);
+      const res = await api.distributeEmail(
+        campaignId,
+        gsheetData,
+        adminToken,
+        distributeAt,
+        comingSoonUrl || null,
+      );
       showToast(
         `Đã phát thành công cho ${res.success.length} user, thất bại ${res.failed.length}`,
       );
@@ -305,6 +339,8 @@ document
       // Reset UI after success
       gsheetData = [];
       document.getElementById("gsheet-preview-body").innerHTML = "";
+      document.getElementById("gsheet-dist-time").value = "";
+      document.getElementById("gsheet-coming-soon-url").value = "";
       document
         .getElementById("gsheet-preview-container")
         .classList.add("hidden");
