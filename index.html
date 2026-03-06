@@ -9,216 +9,74 @@
   <body>
     <div id="app">
       <header>
-        <h1>Trung Tâm Tặng Vé</h1>
-        <nav id="tabs">
-          <button class="tab-btn active" data-tab="user">
-            Cổng Người Dùng
-          </button>
-          <button class="tab-btn" data-tab="admin">Quản Trị Viên</button>
-        </nav>
+        <h1>Hệ Thống Phát Vé</h1>
+        <div style="max-width: 400px; margin: 0 auto">
+          <input
+            type="password"
+            id="admin-token"
+            placeholder="Mã Admin Secret"
+            value="n7QLEXVhdqEqrqaVWinUpAPhIJyJihmT42w_uPGc79lOunanVUOsm8f3TWgjbU0vGNvtA0B3VuZotyY-WLjBBw"
+          />
+        </div>
       </header>
 
       <main>
-        <!-- User Section -->
-        <section id="user-section" class="tab-content active">
-          <div class="card full-width">
-            <h3>Xác thực Người dùng</h3>
-            <p>
-              Nhập mã Bearer Token (JWT) của bạn để xem vé và thực hiện các hành
-              động người dùng.
-            </p>
-            <div class="form-group">
-              <input
-                type="text"
-                id="user-token-input"
-                placeholder="Mã JWT (Bearer Token)"
-              />
-            </div>
-          </div>
-
-          <div class="grid">
-            <div class="card">
-              <h3>Nhận Vé Qua Mã</h3>
-              <p>Nhập mã giới thiệu của bạn để nhận vé miễn phí.</p>
-              <div class="form-group">
-                <input
-                  type="text"
-                  id="referral-code"
-                  placeholder="Vd: REF-1234"
-                />
-                <button id="claim-referral-btn" class="primary-btn">
-                  Nhận Vé Ngay
-                </button>
-              </div>
-            </div>
-
-            <div class="card">
-              <h3>Phần Thưởng Nhiệm Vụ</h3>
-              <p>Hoàn thành các nhiệm vụ cộng đồng để nhận thêm vé.</p>
-              <div class="form-group">
-                <input
-                  type="text"
-                  id="task-campaign-id"
-                  placeholder="ID Chiến dịch"
-                />
-                <button id="claim-task-btn" class="secondary-btn">
-                  Kiểm Tra Điều Kiện
-                </button>
-              </div>
-            </div>
-
-            <div class="card full-width">
-              <h3>Vé Của Tôi</h3>
-              <button id="refresh-tickets-btn" class="text-btn">Làm mới</button>
-              <div id="ticket-list" class="ticket-grid">
-                <p class="placeholder">Đang tải danh sách vé...</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Admin Section -->
-        <section id="admin-section" class="tab-content">
-          <div class="grid">
-            <div class="card">
-              <h3>Tạo Chiến Dịch</h3>
-              <div class="form">
-                <input
-                  type="password"
-                  id="admin-token"
-                  placeholder="Mã Admin Secret"
-                  value="n7QLEXVhdqEqrqaVWinUpAPhIJyJihmT42w_uPGc79lOunanVUOsm8f3TWgjbU0vGNvtA0B3VuZotyY-WLjBBw"
-                />
-                <input
-                  type="text"
-                  id="campaign-name"
-                  placeholder="Tên chiến dịch"
-                />
-                <select id="campaign-type">
-                  <option value="EMAIL_DISTRIBUTION">Phát qua Email</option>
-                  <option value="REFERRAL_CODE">Mã Giới Thiệu</option>
-                  <option value="TASK_BASED">Theo Nhiệm Vụ</option>
-                </select>
-                <input
-                  type="text"
-                  id="target-event-id"
-                  placeholder="ID Sự kiện (Event ID)"
-                />
-                <input
-                  type="text"
-                  id="ticket-type-id"
-                  placeholder="ID Loại vé (Ticket Type ID)"
-                />
-                <input
-                  type="text"
-                  id="referral-code-input"
-                  placeholder="Mã giới thiệu (Nếu có)"
-                />
-                <div class="date-group">
-                  <label>Ngày bắt đầu</label>
-                  <input type="datetime-local" id="start-date" />
-                </div>
-                <div class="date-group">
-                  <label>Ngày kết thúc</label>
-                  <input type="datetime-local" id="end-date" />
-                </div>
-                <input
-                  type="number"
-                  id="total-quantity"
-                  placeholder="Tổng số lượng vé"
-                />
-                <button id="create-campaign-btn" class="primary-btn">
-                  Khởi Tạo Chiến Dịch
-                </button>
-              </div>
-            </div>
-
-            <div class="card">
-              <h3>Phát Vé Qua Email</h3>
-              <div class="form">
-                <input
-                  type="text"
-                  id="dist-campaign-id"
-                  placeholder="ID Chiến dịch"
-                />
-                <textarea
-                  id="dist-emails"
-                  placeholder="Danh sách Email (mỗi dòng 1 email) hoặc JSON: [{email: '...', quantity: 1}]"
-                ></textarea>
-
-                <div
-                  style="
-                    margin-top: 10px;
-                    border-top: 1px dashed rgba(255, 255, 255, 0.2);
-                    padding-top: 10px;
-                  "
-                >
-                  <label
-                    style="
-                      font-size: 0.9rem;
-                      margin-bottom: 5px;
-                      display: block;
-                    "
-                    >Tùy chọn: Đặt lịch phát vé (Tương lai)</label
-                  >
-                  <div class="date-group" style="margin-bottom: 10px">
-                    <label>Thời gian phát (Tùy chọn)</label>
-                    <input type="datetime-local" id="dist-time" />
-                  </div>
-                  <input
-                    type="text"
-                    id="dist-coming-soon-url"
-                    placeholder="URL ảnh Coming Soon (Nếu đặt lịch)"
-                  />
-                </div>
-
-                <button
-                  id="distribute-email-btn"
-                  class="primary-btn"
-                  style="margin-top: 10px"
-                >
-                  Phát Vé Ngay
-                </button>
-              </div>
-            </div>
-
-            <div class="card">
-              <h3>Nhập Kho Vé (Inventory)</h3>
-              <div class="form">
-                <input
-                  type="text"
-                  id="import-campaign-id"
-                  placeholder="ID Chiến dịch"
-                />
-                <textarea
-                  id="import-data"
-                  placeholder='Định dạng JSON: [{"ticketCode": "...", "imageUrl": "..."}]'
-                ></textarea>
-                <button id="import-inventory-btn" class="secondary-btn">
-                  Nhập Kho
-                </button>
-              </div>
-            </div>
-
+        <section id="admin-section" class="tab-content active">
+          <div
+            class="grid"
+            style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto"
+          >
             <div class="card full-width">
               <h3>Phát Vé Từ Google Sheets</h3>
-              <p>
-                Nhập Link Google Sheet (Chế độ: Bất kỳ ai có liên kết đều có thể
-                xem).
-              </p>
+              <p>Chọn sheet đã lưu hoặc nhập link mới để tải dữ liệu.</p>
+
               <div class="form">
+                <!-- Quản lý Sheet -->
+                <div
+                  style="
+                    background: rgba(0, 0, 0, 0.2);
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                  "
+                >
+                  <h4 style="margin-bottom: 10px">Sheet Đã Lưu</h4>
+                  <div style="display: flex; gap: 10px; margin-bottom: 15px">
+                    <select id="saved-sheets-select" style="flex: 1">
+                      <option value="">-- Chọn Sheet --</option>
+                    </select>
+                    <button
+                      id="delete-sheet-btn"
+                      class="secondary-btn"
+                      style="background: #ef4444"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+
+                  <div style="display: flex; gap: 10px">
+                    <input
+                      type="text"
+                      id="save-sheet-name"
+                      placeholder="Tên để nhớ (VD: Sự kiện tháng 10)"
+                      style="flex: 1"
+                    />
+                    <button id="save-sheet-btn" class="secondary-btn">
+                      Lưu Sheet Hiện Tại
+                    </button>
+                  </div>
+                </div>
+
                 <div style="display: flex; flex-direction: column; gap: 10px">
                   <input
                     type="text"
                     id="gsheet-url"
                     placeholder="Link Google Sheet (Chỉ xem)"
-                    style="flex: 1"
                   />
                   <input
                     type="text"
                     id="gsheet-gas-url"
                     placeholder="Link Google Apps Script (Để khóa ô & Lưu vết)"
-                    style="flex: 1"
                   />
                   <button id="load-gsheet-btn" class="secondary-btn">
                     Tải Dữ Liệu
@@ -271,9 +129,7 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody id="gsheet-preview-body">
-                        <!-- Preview rows go here -->
-                      </tbody>
+                      <tbody id="gsheet-preview-body"></tbody>
                     </table>
                   </div>
                   <div class="form-group">
@@ -282,7 +138,6 @@
                       id="gsheet-campaign-id"
                       placeholder="ID Chiến dịch đích"
                     />
-
                     <div
                       style="
                         margin-top: 10px;
@@ -308,7 +163,6 @@
                         placeholder="URL ảnh Coming Soon (Nếu đặt lịch)"
                       />
                     </div>
-
                     <button
                       id="gsheet-distribute-btn"
                       class="primary-btn"
@@ -318,6 +172,53 @@
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div class="card full-width">
+              <h3>Phát Vé Thủ Công Qua Email</h3>
+              <div class="form">
+                <input
+                  type="text"
+                  id="dist-campaign-id"
+                  placeholder="ID Chiến dịch"
+                />
+                <textarea
+                  id="dist-emails"
+                  placeholder="Danh sách Email (mỗi dòng 1 email) hoặc JSON"
+                ></textarea>
+                <div
+                  style="
+                    margin-top: 10px;
+                    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+                    padding-top: 10px;
+                  "
+                >
+                  <label
+                    style="
+                      font-size: 0.9rem;
+                      margin-bottom: 5px;
+                      display: block;
+                    "
+                    >Tùy chọn: Đặt lịch phát vé (Tương lai)</label
+                  >
+                  <div class="date-group" style="margin-bottom: 10px">
+                    <label>Thời gian phát (Tùy chọn)</label>
+                    <input type="datetime-local" id="dist-time" />
+                  </div>
+                  <input
+                    type="text"
+                    id="dist-coming-soon-url"
+                    placeholder="URL ảnh Coming Soon (Nếu đặt lịch)"
+                  />
+                </div>
+                <button
+                  id="distribute-email-btn"
+                  class="primary-btn"
+                  style="margin-top: 10px"
+                >
+                  Phát Vé Ngay
+                </button>
               </div>
             </div>
           </div>
