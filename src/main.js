@@ -296,3 +296,104 @@ document
       showToast(err.message, "error");
     }
   });
+
+// ----- Sync Logic -----
+document.getElementById("sync-btn").addEventListener("click", async () => {
+  const sourceUrlsRaw = document
+    .getElementById("sync-source-sheets")
+    .value.trim();
+  const gasUrl = document.getElementById("sync-gas-url").value.trim();
+
+  if (!sourceUrlsRaw)
+    return showToast("Vui lòng nhập Link các Sheet đã phát", "error");
+  if (!gasUrl || !gasUrl.includes("script.google.com")) {
+    return showToast(
+      "Vui lòng nhập Link Google Apps Script hợp lệ của Sheet Gốc",
+      "error",
+    );
+  }
+
+  const urls = sourceUrlsRaw
+    .split("\n")
+    .map((u) => u.trim())
+    .filter((u) => u);
+  const sentEmailsMap = {};
+
+  try {
+    showToast("Đang tải và phân tích dữ liệu từ các sheet...", "info");
+    document.getElementById("sync-btn").disabled = true;
+
+    for (const url of urls) {
+      const csvUrl = parseGoogleSheetUrl(url);
+      const response = await fetch(csvUrl);
+      if (!response.ok) {
+        showToast(`Lỗi tải sheet: ${url.substring(0, 30)}... Bỏ qua.`, "error");
+        continue;
+      }
+      const text = await response.text();
+      const rawLines = text.split("\n");
+
+      rawLines.slice(2).forEach((line) => {
+        // Tách dòng bằng phẩy
+        const rowData = line.split(",");
+        const email = rowData[1] ? rowData[1].trim().toLowerCase() : "";
+        if (!email) return;
+
+        let status = "";
+
+        // 1. Quét thẳng vào cột H (Index 7 của mảng)
+        if (rowData[7] && rowData[7].toUpperCase().includes("SENT")) {
+          status = rowData[7].trim();
+        }
+        // 2. Nếu không thấy ở cột H, quét toàn bộ dòng từ Cột C (Index 2) trở về sau để bắt chữ SENT
+        else {
+          for (let k = 2; k < rowData.length; k++) {
+            if (rowData[k] && rowData[k].toUpperCase().includes("SENT")) {
+              status = rowData[k].trim();
+              break;
+            }
+          }
+        }
+
+        // 3. Dự phòng: Nếu mảng bị đứt đoạn không lặp tới được cột chứa dữ liệu, quét bằng Regex
+        if (!status) {
+          const sentMatch = line.match(/(SENT[^,]*)/i);
+          if (sentMatch && sentMatch[1]) {
+            status = sentMatch[1].trim();
+          }
+        }
+
+        if (status) {
+          // Xóa dấu nháy kép thừa nếu có
+          sentEmailsMap[email] = status.replace(/"/g, "");
+        }
+      });
+    }
+
+    const emailCount = Object.keys(sentEmailsMap).length;
+    if (emailCount === 0) {
+      document.getElementById("sync-btn").disabled = false;
+      return showToast("Không tìm thấy email nào có trạng thái SENT", "error");
+    }
+
+    showToast(
+      `Tìm thấy ${emailCount} email gửi thành công. Đang gửi sang Sheet Gốc...`,
+      "info",
+    );
+
+    // GỌI GAS
+    await fetch(gasUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ action: "sync", syncData: sentEmailsMap }), // action sync
+    });
+
+    showToast("Đã gửi lệnh đồng bộ sang Sheet Gốc thành công!", "success");
+    document.getElementById("sync-source-sheets").value = "";
+  } catch (e) {
+    showToast("Lỗi đồng bộ: " + e.message, "error");
+  } finally {
+    document.getElementById("sync-btn").disabled = false;
+  }
+});

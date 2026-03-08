@@ -221,6 +221,32 @@
                 </button>
               </div>
             </div>
+            </div>
+
+            <div class="card full-width" style="margin-top: 20px;">
+              <h3>Đồng Bộ Trạng Thái SENT Sang Sheet Gốc</h3>
+              <div class="form">
+                <p style="font-size: 0.9rem; margin-bottom: 10px; color: #ccc;">
+                  Hệ thống sẽ tải dữ liệu từ các sheet phân phối, tìm các email đã có trạng thái SENT, sau đó gửi lệnh sang Sheet Gốc để điền vào cột F (bỏ qua những dòng trùng lặp).
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <textarea
+                    id="sync-source-sheets"
+                    placeholder="Danh sách Link Google Sheet ĐÃ PHÁT VÉ (Mỗi dòng 1 link)"
+                    rows="4"
+                  ></textarea>
+                  <input
+                    type="text"
+                    id="sync-gas-url"
+                    placeholder="Link Google Apps Script Web App của SHEET GỐC"
+                  />
+                  <button id="sync-btn" class="primary-btn">
+                    Bắt Đầu Đồng Bộ
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
       </main>
